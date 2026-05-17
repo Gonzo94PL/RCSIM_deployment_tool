@@ -1,0 +1,380 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <jules@devbox>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-27 12:24+0000\n"
+"PO-Revision-Date: 2025-09-27 12:25+0000\n"
+"Last-Translator:  <jules@devbox>\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: RCsimRPi5deploymentapp.py:60
+msgid "RCSIM - Deployment Tool (v6.4 Bulletproof)"
+msgstr "RCSIM - Deployment Tool (v6.4 Bulletproof)"
+
+#: RCsimRPi5deploymentapp.py:90
+msgid "1. Raspberry Pi Connection Details"
+msgstr "1. Raspberry Pi Connection Details"
+
+#: RCsimRPi5deploymentapp.py:92
+msgid "IP Address / Host:"
+msgstr "IP Address / Host:"
+
+#: RCsimRPi5deploymentapp.py:94
+msgid "User:"
+msgstr "User:"
+
+#: RCsimRPi5deploymentapp.py:96
+msgid "Password (initial):"
+msgstr "Password (initial):"
+
+#: RCsimRPi5deploymentapp.py:98
+msgid "New Password (optional):"
+msgstr "New Password (optional):"
+
+#: RCsimRPi5deploymentapp.py:102
+msgid "2. Project Source for RPi"
+msgstr "2. Project Source for RPi"
+
+#: RCsimRPi5deploymentapp.py:104
+msgid "Project Directory:"
+msgstr "Project Directory:"
+
+#: RCsimRPi5deploymentapp.py:107
+msgid "Browse..."
+msgstr "Browse..."
+
+#: RCsimRPi5deploymentapp.py:111
+msgid "3. Project Configuration (generates config.json)"
+msgstr "3. Project Configuration (generates config.json)"
+
+#: RCsimRPi5deploymentapp.py:116
+msgid "Tailscale PC IP:"
+msgstr "Tailscale PC IP:"
+
+#: RCsimRPi5deploymentapp.py:118
+msgid "Fetch My IP"
+msgstr "Fetch My IP"
+
+#: RCsimRPi5deploymentapp.py:121
+msgid "Use RTK Positioning (NTRIP)"
+msgstr "Use RTK Positioning (NTRIP)"
+
+#: RCsimRPi5deploymentapp.py:126
+msgid "NTRIP User:"
+msgstr "NTRIP User:"
+
+#: RCsimRPi5deploymentapp.py:128
+msgid "NTRIP Password:"
+msgstr "NTRIP Password:"
+
+#: RCsimRPi5deploymentapp.py:131
+msgid "NTRIP Host:"
+msgstr "NTRIP Host:"
+
+#: RCsimRPi5deploymentapp.py:133
+msgid "NTRIP Port:"
+msgstr "NTRIP Port:"
+
+#: RCsimRPi5deploymentapp.py:135
+msgid "NTRIP Mountpoint:"
+msgstr "NTRIP Mountpoint:"
+
+#: RCsimRPi5deploymentapp.py:140
+msgid "Start Deployment on RPi"
+msgstr "Start Deployment on RPi"
+
+#: RCsimRPi5deploymentapp.py:143
+msgid "Test SSH Connection"
+msgstr "Test SSH Connection"
+
+#: RCsimRPi5deploymentapp.py:147
+msgid "Deployment Logs"
+msgstr "Deployment Logs"
+
+#: RCsimRPi5deploymentapp.py:170
+msgid "Fetching PC Tailscale IP..."
+msgstr "Fetching PC Tailscale IP..."
+
+#: RCsimRPi5deploymentapp.py:176
+#, python-brace-format
+msgid "Found IP: {ip}"
+msgstr "Found IP: {ip}"
+
+#: RCsimRPi5deploymentapp.py:178
+msgid "Could not get IP. Is Tailscale active and connected?"
+msgstr "Could not get IP. Is Tailscale active and connected?"
+
+#: RCsimRPi5deploymentapp.py:180
+msgid "'tailscale' command not found. Please install Tailscale on the PC."
+msgstr "'tailscale' command not found. Please install Tailscale on the PC."
+
+#: RCsimRPi5deploymentapp.py:182
+#, python-brace-format
+msgid "Error fetching IP: {e}"
+msgstr "Error fetching IP: {e}"
+
+#: RCsimRPi5deploymentapp.py:365 RCsimRPi5deploymentapp.py:381
+#: RCsimRPi5deploymentapp.py:506 RCsimRPi5deploymentapp.py:510
+#: RCsimRPi5deploymentapp.py:558
+msgid "Error"
+msgstr "Error"
+
+#: RCsimRPi5deploymentapp.py:365
+#, python-brace-format
+msgid "Source directory does not exist: {source_dir}"
+msgstr "Source directory does not exist: {source_dir}"
+
+#: RCsimRPi5deploymentapp.py:369 RCsimRPi5deploymentapp.py:420
+msgid "Missing Data"
+msgstr "Missing Data"
+
+#: RCsimRPi5deploymentapp.py:369
+msgid "Enter or fetch the Tailscale IP of the PC."
+msgstr "Enter or fetch the Tailscale IP of the PC."
+
+#: RCsimRPi5deploymentapp.py:381
+msgid "NTRIP port must be an integer."
+msgstr "NTRIP port must be an integer."
+
+#: RCsimRPi5deploymentapp.py:388
+#, python-brace-format
+msgid "Detected existing temporary directory: {temp_dir}. Cleaning up..."
+msgstr "Detected existing temporary directory: {temp_dir}. Cleaning up..."
+
+#: RCsimRPi5deploymentapp.py:392
+#, python-brace-format
+msgid "Error while deleting '{temp_dir}': {e}. Deployment aborted."
+msgstr "Error while deleting '{temp_dir}': {e}. Deployment aborted."
+
+#: RCsimRPi5deploymentapp.py:393 RCsimRPi5deploymentapp.py:515
+msgid "Critical Error"
+msgstr "Critical Error"
+
+#: RCsimRPi5deploymentapp.py:394
+#, python-brace-format
+msgid ""
+"Could not delete directory '{temp_dir}'. It may be in use by another "
+"process.\n"
+"\n"
+"Details: {e}"
+msgstr ""
+"Could not delete directory '{temp_dir}'. It may be in use by another "
+"process.\n"
+"\n"
+"Details: {e}"
+
+#: RCsimRPi5deploymentapp.py:406
+msgid "Generated config.json file."
+msgstr "Generated config.json file."
+
+#: RCsimRPi5deploymentapp.py:410
+msgid "Packed project to: {os.path.basename(final_archive_path)}"
+msgstr "Packed project to: {os.path.basename(final_archive_path)}"
+
+#: RCsimRPi5deploymentapp.py:413
+#, python-brace-format
+msgid "CRITICAL ERROR during project archive creation: {e}"
+msgstr "CRITICAL ERROR during project archive creation: {e}"
+
+#: RCsimRPi5deploymentapp.py:414
+msgid "Archive Creation Error"
+msgstr "Archive Creation Error"
+
+#: RCsimRPi5deploymentapp.py:420
+msgid "Fill in the Raspberry Pi connection details (host, user, pass)."
+msgstr "Fill in the Raspberry Pi connection details (host, user, pass)."
+
+#: RCsimRPi5deploymentapp.py:432
+msgid ""
+"\n"
+"--- Starting new deployment ---"
+msgstr ""
+"\n"
+"--- Starting new deployment ---"
+
+#: RCsimRPi5deploymentapp.py:440
+msgid "Deployment aborted due to archive creation error."
+msgstr "Deployment aborted due to archive creation error."
+
+#: RCsimRPi5deploymentapp.py:444
+msgid "Key file 'main.py' not found in the source directory!"
+msgstr "Key file 'main.py' not found in the source directory!"
+
+#: RCsimRPi5deploymentapp.py:448
+msgid "Deployment aborted due to SSH connection error."
+msgstr "Deployment aborted due to SSH connection error."
+
+#: RCsimRPi5deploymentapp.py:454
+msgid "Uploading archive {os.path.basename(archive_path)} to RPi..."
+msgstr "Uploading archive {os.path.basename(archive_path)} to RPi..."
+
+#: RCsimRPi5deploymentapp.py:456
+msgid "Archive upload complete."
+msgstr "Archive upload complete."
+
+#: RCsimRPi5deploymentapp.py:459
+msgid "Uploading setup script..."
+msgstr "Uploading setup script..."
+
+#: RCsimRPi5deploymentapp.py:464
+msgid "Script upload complete."
+msgstr "Script upload complete."
+
+#: RCsimRPi5deploymentapp.py:466
+msgid ""
+"\n"
+"--- Running script on RPi (this may take several minutes) ---"
+msgstr ""
+"\n"
+"--- Running script on RPi (this may take several minutes) ---"
+
+#: RCsimRPi5deploymentapp.py:478
+#, python-brace-format
+msgid "Opening authorization link in browser: {url_to_open}"
+msgstr "Opening authorization link in browser: {url_to_open}"
+
+#: RCsimRPi5deploymentapp.py:485
+#, python-brace-format
+msgid ""
+"\n"
+"Script on RPi finished with exit code: {exit_status}"
+msgstr ""
+"\n"
+"Script on RPi finished with exit code: {exit_status}"
+
+#: RCsimRPi5deploymentapp.py:488
+msgid ""
+"\n"
+"DEPLOYMENT COMPLETED SUCCESSFULLY!\n"
+msgstr ""
+"\n"
+"DEPLOYMENT COMPLETED SUCCESSFULLY!\n"
+
+#: RCsimRPi5deploymentapp.py:489 RCsimRPi5deploymentapp.py:556
+msgid "Success"
+msgstr "Success"
+
+#: RCsimRPi5deploymentapp.py:489
+msgid "Deployment completed successfully!"
+msgstr "Deployment completed successfully!"
+
+#: RCsimRPi5deploymentapp.py:493
+msgid "Password in GUI has been updated."
+msgstr "Password in GUI has been updated."
+
+#: RCsimRPi5deploymentapp.py:495
+#, python-brace-format
+msgid ""
+"\n"
+"!!! DEPLOYMENT FAILED (code: {exit_status}) !!!\n"
+msgstr ""
+"\n"
+"!!! DEPLOYMENT FAILED (code: {exit_status}) !!!\n"
+
+#: RCsimRPi5deploymentapp.py:496
+msgid "Fetching remote log file for diagnostics..."
+msgstr "Fetching remote log file for diagnostics..."
+
+#: RCsimRPi5deploymentapp.py:503
+msgid ""
+"\n"
+"--- REMOTE LOG CONTENTS (rpi_setup.log) ---\n"
+msgstr ""
+"\n"
+"--- REMOTE LOG CONTENTS (rpi_setup.log) ---\n"
+
+#: RCsimRPi5deploymentapp.py:505
+msgid ""
+"\n"
+"--- END OF REMOTE LOG ---\n"
+msgstr ""
+"\n"
+"--- END OF REMOTE LOG ---\n"
+
+#: RCsimRPi5deploymentapp.py:507
+#, python-brace-format
+msgid ""
+"Installation failed (code: {exit_status}).\n"
+"\n"
+"Detailed logs from the RPi have been displayed in the application window."
+msgstr ""
+"Installation failed (code: {exit_status}).\n"
+"\n"
+"Detailed logs from the RPi have been displayed in the application window."
+
+#: RCsimRPi5deploymentapp.py:509
+#, python-brace-format
+msgid "Failed to fetch remote log file: {log_e}"
+msgstr "Failed to fetch remote log file: {log_e}"
+
+#: RCsimRPi5deploymentapp.py:511
+#, python-brace-format
+msgid ""
+"Installation failed (code: {exit_status}).\n"
+"\n"
+"Also failed to retrieve remote logs."
+msgstr ""
+"Installation failed (code: {exit_status}).\n"
+"\n"
+"Also failed to retrieve remote logs."
+
+#: RCsimRPi5deploymentapp.py:514
+#, python-brace-format
+msgid ""
+"\n"
+"CRITICAL ERROR IN DEPLOYMENT PROCESS: {e}"
+msgstr ""
+"\n"
+"CRITICAL ERROR IN DEPLOYMENT PROCESS: {e}"
+
+#: RCsimRPi5deploymentapp.py:521
+msgid ""
+"\n"
+"--- Deployment session ended ---"
+msgstr ""
+"\n"
+"--- Deployment session ended ---"
+
+#: RCsimRPi5deploymentapp.py:538
+msgid "SSH connection to RPi established successfully."
+msgstr "SSH connection to RPi established successfully."
+
+#: RCsimRPi5deploymentapp.py:541
+#, python-brace-format
+msgid "SSH connection error: {e}"
+msgstr "SSH connection error: {e}"
+
+#: RCsimRPi5deploymentapp.py:551
+msgid ""
+"\n"
+"Testing SSH connection..."
+msgstr ""
+"\n"
+"Testing SSH connection..."
+
+#: RCsimRPi5deploymentapp.py:556
+msgid "SSH connection is working correctly!"
+msgstr "SSH connection is working correctly!"
+
+#: RCsimRPi5deploymentapp.py:558
+msgid "Failed to establish SSH connection."
+msgstr "Failed to establish SSH connection."
+
+#: RCsimRPi5deploymentapp.py:564
+msgid "Select the main project directory for the RPi"
+msgstr "Select the main project directory for the RPi"
+
+#: RCsimRPi5deploymentapp.py:567
+#, python-brace-format
+msgid "Selected source directory: {dir_name}"
+msgstr "Selected source directory: {dir_name}"

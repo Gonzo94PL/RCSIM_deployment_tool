@@ -1,0 +1,481 @@
+# Polish translations for PACKAGE package.
+# Copyright (C) 2025 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#  <jules@devbox>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-27 12:24+0000\n"
+"PO-Revision-Date: 2025-09-27 12:25+0000\n"
+"Last-Translator:  <jules@devbox>\n"
+"Language-Team: Polish <translation-team-pl@lists.sourceforge.net>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: RCsimRPi5deploymentapp.py:60
+msgid "RCSIM - Deployment Tool (v6.4 Bulletproof)"
+msgstr "RCSIM - Narzędzie Wdrożeniowe (v6.4 Bulletproof)"
+
+#: RCsimRPi5deploymentapp.py:90
+msgid "1. Raspberry Pi Connection Details"
+msgstr "1. Dane połączenia z Raspberry Pi"
+
+#: RCsimRPi5deploymentapp.py:92
+msgid "IP Address / Host:"
+msgstr "Adres IP / Host:"
+
+#: RCsimRPi5deploymentapp.py:94
+msgid "User:"
+msgstr "Użytkownik:"
+
+#: RCsimRPi5deploymentapp.py:96
+msgid "Password (initial):"
+msgstr "Hasło (początkowe):"
+
+#: RCsimRPi5deploymentapp.py:98
+msgid "New Password (optional):"
+msgstr "Nowe hasło (opcjonalne):"
+
+#: RCsimRPi5deploymentapp.py:102
+msgid "2. Project Source for RPi"
+msgstr "2. Źródło projektu dla RPi"
+
+#: RCsimRPi5deploymentapp.py:104
+msgid "Project Directory:"
+msgstr "Katalog z projektem:"
+
+#: RCsimRPi5deploymentapp.py:107
+msgid "Browse..."
+msgstr "Przeglądaj..."
+
+#: RCsimRPi5deploymentapp.py:111
+msgid "3. Project Configuration (generates config.json)"
+msgstr "3. Konfiguracja projektu (wygeneruje config.json)"
+
+#: RCsimRPi5deploymentapp.py:116
+msgid "Tailscale PC IP:"
+msgstr "IP Tailscale PC:"
+
+#: RCsimRPi5deploymentapp.py:118
+msgid "Fetch My IP"
+msgstr "Pobierz Moje IP"
+
+#: RCsimRPi5deploymentapp.py:121
+msgid "Use RTK Positioning (NTRIP)"
+msgstr "Użyj pozycjonowania RTK (NTRIP)"
+
+#: RCsimRPi5deploymentapp.py:126
+msgid "NTRIP User:"
+msgstr "Użytkownik NTRIP:"
+
+#: RCsimRPi5deploymentapp.py:128
+msgid "NTRIP Password:"
+msgstr "Hasło NTRIP:"
+
+#: RCsimRPi5deploymentapp.py:131
+msgid "NTRIP Host:"
+msgstr "Host NTRIP:"
+
+#: RCsimRPi5deploymentapp.py:133
+msgid "NTRIP Port:"
+msgstr "Port NTRIP:"
+
+#: RCsimRPi5deploymentapp.py:135
+msgid "NTRIP Mountpoint:"
+msgstr "Mountpoint NTRIP:"
+
+#: RCsimRPi5deploymentapp.py:140
+msgid "Start Deployment on RPi"
+msgstr "Rozpocznij wdrożenie na RPi"
+
+#: RCsimRPi5deploymentapp.py:143
+msgid "Test SSH Connection"
+msgstr "Testuj połączenie SSH"
+
+#: RCsimRPi5deploymentapp.py:147
+msgid "Deployment Logs"
+msgstr "Logi wdrożenia"
+
+#: RCsimRPi5deploymentapp.py:170
+msgid "Fetching PC Tailscale IP..."
+msgstr "Pobieranie IP Tailscale PC..."
+
+#: RCsimRPi5deploymentapp.py:176
+#, python-brace-format
+msgid "Found IP: {ip}"
+msgstr "Znaleziono IP: {ip}"
+
+#: RCsimRPi5deploymentapp.py:178
+msgid "Could not get IP. Is Tailscale active and connected?"
+msgstr "Nie można pobrać IP. Czy Tailscale jest aktywny i połączony?"
+
+#: RCsimRPi5deploymentapp.py:180
+msgid "'tailscale' command not found. Please install Tailscale on the PC."
+msgstr "Polecenie 'tailscale' nie znalezione. Zainstaluj Tailscale na PC."
+
+#: RCsimRPi5deploymentapp.py:182
+#, python-brace-format
+msgid "Error fetching IP: {e}"
+msgstr "Błąd pobierania IP: {e}"
+
+#: RCsimRPi5deploymentapp.py:365 RCsimRPi5deploymentapp.py:381
+#: RCsimRPi5deploymentapp.py:506 RCsimRPi5deploymentapp.py:510
+#: RCsimRPi5deploymentapp.py:558
+msgid "Error"
+msgstr "Błąd"
+
+#: RCsimRPi5deploymentapp.py:365
+#, python-brace-format
+msgid "Source directory does not exist: {source_dir}"
+msgstr "Katalog źródłowy nie istnieje: {source_dir}"
+
+#: RCsimRPi5deploymentapp.py:369 RCsimRPi5deploymentapp.py:420
+msgid "Missing Data"
+msgstr "Brak danych"
+
+#: RCsimRPi5deploymentapp.py:369
+msgid "Enter or fetch the Tailscale IP of the PC."
+msgstr "Wprowadź lub pobierz IP Tailscale komputera PC."
+
+#: RCsimRPi5deploymentapp.py:381
+msgid "NTRIP port must be an integer."
+msgstr "Port NTRIP musi być liczbą całkowitą."
+
+#: RCsimRPi5deploymentapp.py:388
+#, python-brace-format
+msgid "Detected existing temporary directory: {temp_dir}. Cleaning up..."
+msgstr "Wykryto istniejący katalog tymczasowy: {temp_dir}. Czyszczenie..."
+
+#: RCsimRPi5deploymentapp.py:392
+#, python-brace-format
+msgid "Error while deleting '{temp_dir}': {e}. Deployment aborted."
+msgstr "Błąd podczas usuwania '{temp_dir}': {e}. Operacja wdrożenia przerwana."
+
+#: RCsimRPi5deploymentapp.py:393 RCsimRPi5deploymentapp.py:515
+msgid "Critical Error"
+msgstr "Błąd krytyczny"
+
+#: RCsimRPi5deploymentapp.py:394
+#, python-brace-format
+msgid ""
+"Could not delete directory '{temp_dir}'. It may be in use by another "
+"process.\n"
+"\n"
+"Details: {e}"
+msgstr ""
+"Nie można usunąć katalogu '{temp_dir}'. Może być używany przez inny "
+"proces.\n"
+"\n"
+"Szczegóły: {e}"
+
+#: RCsimRPi5deploymentapp.py:406
+msgid "Generated config.json file."
+msgstr "Wygenerowano plik config.json."
+
+#: RCsimRPi5deploymentapp.py:410
+msgid "Packed project to: {os.path.basename(final_archive_path)}"
+msgstr "Spakowano projekt do: {os.path.basename(final_archive_path)}"
+
+#: RCsimRPi5deploymentapp.py:413
+#, python-brace-format
+msgid "CRITICAL ERROR during project archive creation: {e}"
+msgstr "KRYTYCZNY BŁĄD podczas tworzenia archiwum projektu: {e}"
+
+#: RCsimRPi5deploymentapp.py:414
+msgid "Archive Creation Error"
+msgstr "Błąd tworzenia archiwum"
+
+#: RCsimRPi5deploymentapp.py:420
+msgid "Fill in the Raspberry Pi connection details (host, user, pass)."
+msgstr "Wypełnij dane połączeniowe Raspberry Pi (host, user, pass)."
+
+#: RCsimRPi5deploymentapp.py:432
+msgid ""
+"\n"
+"--- Starting new deployment ---"
+msgstr "\n--- Rozpoczynanie nowego wdrożenia ---"
+
+#: RCsimRPi5deploymentapp.py:440
+msgid "Deployment aborted due to archive creation error."
+msgstr "Przerwano wdrożenie z powodu błędu tworzenia archiwum."
+
+#: RCsimRPi5deploymentapp.py:444
+msgid "Key file 'main.py' not found in the source directory!"
+msgstr "Brak kluczowego pliku 'main.py' w katalogu źródłowym!"
+
+#: RCsimRPi5deploymentapp.py:448
+msgid "Deployment aborted due to SSH connection error."
+msgstr "Przerwano wdrożenie z powodu błędu połączenia SSH."
+
+#: RCsimRPi5deploymentapp.py:454
+msgid "Uploading archive {os.path.basename(archive_path)} to RPi..."
+msgstr "Przesyłanie archiwum {os.path.basename(archive_path)} na RPi..."
+
+#: RCsimRPi5deploymentapp.py:456
+msgid "Archive upload complete."
+msgstr "Przesyłanie archiwum zakończone."
+
+#: RCsimRPi5deploymentapp.py:459
+msgid "Uploading setup script..."
+msgstr "Przesyłanie skryptu instalacyjnego..."
+
+#: RCsimRPi5deploymentapp.py:464
+msgid "Script upload complete."
+msgstr "Przesyłanie skryptu zakończone."
+
+#: RCsimRPi5deploymentapp.py:466
+msgid ""
+"\n"
+"--- Running script on RPi (this may take several minutes) ---"
+msgstr "\n--- Uruchamianie skryptu na RPi (to może potrwać kilka minut) ---"
+
+#: RCsimRPi5deploymentapp.py:478
+#, python-brace-format
+msgid "Opening authorization link in browser: {url_to_open}"
+msgstr "Otwieram link autoryzacyjny w przeglądarce: {url_to_open}"
+
+#: RCsimRPi5deploymentapp.py:485
+#, python-brace-format
+msgid ""
+"\n"
+"Script on RPi finished with exit code: {exit_status}"
+msgstr "\nSkrypt na RPi zakończony z kodem wyjścia: {exit_status}"
+
+#: RCsimRPi5deploymentapp.py:488
+msgid ""
+"\n"
+"DEPLOYMENT COMPLETED SUCCESSFULLY!\n"
+msgstr "\nWDROŻENIE ZAKOŃCZONE POMYŚLNIE!\n"
+
+#: RCsimRPi5deploymentapp.py:489 RCsimRPi5deploymentapp.py:556
+msgid "Success"
+msgstr "Sukces"
+
+#: RCsimRPi5deploymentapp.py:489
+msgid "Deployment completed successfully!"
+msgstr "Wdrożenie zakończone pomyślnie!"
+
+#: RCsimRPi5deploymentapp.py:493
+msgid "Password in GUI has been updated."
+msgstr "Hasło w GUI zostało zaktualizowane."
+
+#: RCsimRPi5deploymentapp.py:495
+#, python-brace-format
+msgid ""
+"\n"
+"!!! DEPLOYMENT FAILED (code: {exit_status}) !!!\n"
+msgstr "\n!!! WDROŻENIE NIE POWIODŁO SIĘ (kod: {exit_status}) !!!\n"
+
+#: RCsimRPi5deploymentapp.py:496
+msgid "Fetching remote log file for diagnostics..."
+msgstr "Pobieram zdalny plik logu w celu diagnostyki..."
+
+#: RCsimRPi5deploymentapp.py:503
+msgid ""
+"\n"
+"--- REMOTE LOG CONTENTS (rpi_setup.log) ---\n"
+msgstr "\n--- ZAWARTOŚĆ ZDALNEGO LOGU (rpi_setup.log) ---\n"
+
+#: RCsimRPi5deploymentapp.py:505
+msgid ""
+"\n"
+"--- END OF REMOTE LOG ---\n"
+msgstr "\n--- KONIEC ZDALNEGO LOGU ---\n"
+
+#: RCsimRPi5deploymentapp.py:507
+#, python-brace-format
+msgid ""
+"Installation failed (code: {exit_status}).\n"
+"\n"
+"Detailed logs from the RPi have been displayed in the application window."
+msgstr ""
+"Instalacja nie powiodła się (kod: {exit_status}).\n"
+"\n"
+"Szczegółowe logi z RPi zostały wyświetlone w oknie aplikacji."
+
+#: RCsimRPi5deploymentapp.py:509
+#, python-brace-format
+msgid "Failed to fetch remote log file: {log_e}"
+msgstr "Nie udało się pobrać zdalnego pliku logu: {log_e}"
+
+#: RCsimRPi5deploymentapp.py:511
+#, python-brace-format
+msgid ""
+"Installation failed (code: {exit_status}).\n"
+"\n"
+"Also failed to retrieve remote logs."
+msgstr ""
+"Instalacja nie powiodła się (kod: {exit_status}).\n"
+"\n"
+"Nie udało się także pobrać zdalnych logów."
+
+#: RCsimRPi5deploymentapp.py:514
+#, python-brace-format
+msgid ""
+"\n"
+"CRITICAL ERROR IN DEPLOYMENT PROCESS: {e}"
+msgstr "\nKRYTYCZNY BŁĄD W PROCESIE WDROŻENIA: {e}"
+
+#: RCsimRPi5deploymentapp.py:521
+msgid ""
+"\n"
+"--- Deployment session ended ---"
+msgstr "\n--- Zakończono sesję wdrożeniową ---"
+
+#: RCsimRPi5deploymentapp.py:538
+msgid "SSH connection to RPi established successfully."
+msgstr "Połączenie SSH z RPi nawiązane pomyślnie."
+
+#: RCsimRPi5deploymentapp.py:541
+#, python-brace-format
+msgid "SSH connection error: {e}"
+msgstr "Błąd połączenia SSH: {e}"
+
+#: RCsimRPi5deploymentapp.py:551
+msgid ""
+"\n"
+"Testing SSH connection..."
+msgstr "\nTestowanie połączenia SSH..."
+
+#: RCsimRPi5deploymentapp.py:556
+msgid "SSH connection is working correctly!"
+msgstr "Połączenie SSH działa poprawnie!"
+
+#: RCsimRPi5deploymentapp.py:558
+msgid "Failed to establish SSH connection."
+msgstr "Nie udało się nawiązać połączenia SSH."
+
+#: RCsimRPi5deploymentapp.py:564
+msgid "Select the main project directory for the RPi"
+msgstr "Wybierz główny katalog z projektem dla RPi"
+
+#: RCsimRPi5deploymentapp.py:567
+#, python-brace-format
+msgid "Selected source directory: {dir_name}"
+msgstr "Wybrano katalog źródłowy: {dir_name}"
+
+msgid "Quit"
+msgstr "Wyjdź"
+
+msgid "Do you want to quit?"
+msgstr "Czy chcesz wyjść?"
+
+msgid "Deployment completed!"
+msgstr "Wdrożenie zakończone!"
+
+msgid "Deployment failed: {msg}"
+msgstr "Wdrożenie nie powiodło się: {msg}"
+
+msgid "Update Docker Only"
+msgstr "Aktualizuj tylko Docker"
+
+msgid "Docker update completed!"
+msgstr "Aktualizacja Docker zakończona!"
+
+msgid "Update failed: {m}"
+msgstr "Aktualizacja nie powiodła się: {m}"
+
+msgid "Confirm Reboot"
+msgstr "Potwierdź restart"
+
+msgid "Are you sure?"
+msgstr "Czy jesteś pewien?"
+
+msgid "Diagnostics failed: {m}"
+msgstr "Diagnostyka nie powiodła się: {m}"
+
+msgid "Service Logs"
+msgstr "Logi usługi"
+
+msgid "Select SSH Private Key"
+msgstr "Wybierz klucz prywatny SSH"
+
+msgid "All Files"
+msgstr "Wszystkie pliki"
+
+msgid "Select Project Directory"
+msgstr "Wybierz katalog projektu"
+
+msgid "Could not get IP."
+msgstr "Nie udało się pobrać IP."
+
+msgid "Use SSH Key instead of password"
+msgstr "Użyj klucza SSH zamiast hasła"
+
+msgid "SSH Key Path:"
+msgstr "Ścieżka do klucza SSH:"
+
+msgid "Key Passphrase (optional):"
+msgstr "Hasło klucza (opcjonalne):"
+
+msgid "Hardware"
+msgstr "Sprzęt"
+
+msgid "IMU Driver:"
+msgstr "Sterownik IMU:"
+
+msgid "Enable GPS"
+msgstr "Włącz GPS"
+
+msgid "Port:"
+msgstr "Port:"
+
+msgid "Baudrate:"
+msgstr "Baudrate:"
+
+msgid "Enable Lidar (LD08)"
+msgstr "Włącz Lidar (LD08)"
+
+msgid "Lidar Port:"
+msgstr "Port Lidaru:"
+
+msgid "Video & Camera"
+msgstr "Wideo i kamera"
+
+msgid "Camera Port:"
+msgstr "Port kamery:"
+
+msgid "Advanced Actions"
+msgstr "Akcje zaawansowane"
+
+msgid "Restart Service"
+msgstr "Restartuj usługę"
+
+msgid "Show Logs"
+msgstr "Pokaż logi"
+
+msgid "Reboot RPi"
+msgstr "Restartuj RPi"
+
+msgid "Run Diagnostics"
+msgstr "Uruchom diagnostykę"
+
+msgid "Industrial"
+msgstr "Przemysłowy"
+
+msgid "Video"
+msgstr "Wideo"
+
+msgid "Service restarted successfully."
+msgstr "Usługa zrestartowana pomyślnie."
+
+msgid "Failed to restart service."
+msgstr "Nie udało się zrestartować usługi."
+
+msgid "Logs fetched successfully."
+msgstr "Logi pobrane pomyślnie."
+
+msgid "Failed to fetch logs."
+msgstr "Nie udało się pobrać logów."
+
+msgid "Reboot command sent."
+msgstr "Polecenie restartu wysłane."
+
+msgid "Failed to send reboot command."
+msgstr "Nie udało się wysłać polecenia restartu."
