@@ -185,27 +185,43 @@ class SourceFrame(BaseFrame):
     """
 
     def __init__(
-        self, master: tk.Widget, config_manager: Any, on_browse: Callable
+        self, master: tk.Widget, config_manager: Any, on_browse: Callable, on_app_type_change: Callable
     ) -> None:
         """
         Inicjalizuje ramkę źródłową.
         """
         super().__init__(master, config_manager, padding="15", style="Bold.TLabelframe")
         self.on_browse = on_browse
+        self.on_app_type_change = on_app_type_change
         self.columnconfigure(1, weight=1)
         self._create_widgets()
 
     def _create_widgets(self) -> None:
+        # App Type
+        self.app_type_label = ttk.Label(self)
+        self.app_type_label.grid(row=0, column=0, sticky="e", padx=5, pady=5)
+        self.app_type_combo = ttk.Combobox(
+            self,
+            textvariable=self.cfg.app_type_var,
+            values=["RCSIM_DOCKER", "RCSIM_MCS"],
+            state="readonly",
+            width=25,
+        )
+        self.app_type_combo.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        self.app_type_combo.bind("<<ComboboxSelected>>", self.on_app_type_change)
+
+        # Project Directory
         self.project_dir_label = ttk.Label(self)
-        self.project_dir_label.grid(row=0, column=0, sticky="e", padx=5, pady=5)
+        self.project_dir_label.grid(row=1, column=0, sticky="e", padx=5, pady=5)
         ttk.Entry(self, textvariable=self.cfg.project_source_dir_var).grid(
-            row=0, column=1, padx=5, pady=5, sticky="ew"
+            row=1, column=1, padx=5, pady=5, sticky="ew"
         )
         self.browse_button = ttk.Button(self, command=self.on_browse)
-        self.browse_button.grid(row=0, column=2, padx=5, pady=5)
+        self.browse_button.grid(row=1, column=2, padx=5, pady=5)
 
     def update_texts(self) -> None:
         self.configure(text=self._translate("📁  2. Project Source for RPi"))
+        self.app_type_label.config(text=self._translate("Application Type:"))
         self.project_dir_label.config(text=self._translate("Project Directory:"))
         self.browse_button.config(text=self._translate("📂 Browse..."))
 

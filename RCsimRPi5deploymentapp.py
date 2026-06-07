@@ -436,7 +436,7 @@ class DeploymentApp:
         self.connection_frame.pack(fill=tk.X, pady=(0, 8))
 
         self.source_frame = SourceFrame(
-            left_frame, self.config_manager, self._browse_project_dir
+            left_frame, self.config_manager, self._browse_project_dir, self._on_app_type_change
         )
         self.source_frame.pack(fill=tk.X, pady=(0, 8))
 
@@ -496,6 +496,9 @@ class DeploymentApp:
             mode="determinate",
         )
         self.progress_bar.grid(row=0, column=0, sticky="ew")
+
+        # Apply initial application type layout rules
+        self._on_app_type_change()
 
     # --- Actions & Logic ---
 
@@ -594,6 +597,48 @@ class DeploymentApp:
         enable = self.config_manager.lidar_enabled_var.get()
         state = "normal" if enable else "disabled"
         self.config_frame.lidar_port_entry.configure(state=state)
+
+    def _on_app_type_change(self, event: Any = None) -> None:
+        """Dynamicznie dostosowuje interfejs w zależności od typu aplikacji."""
+        app_type = self.config_manager.app_type_var.get()
+        if app_type == "RCSIM_MCS":
+            # Wyłączenie/Ukrycie sekcji wideo, RTK i komunikacji niepotrzebnych dla MCS
+            self.config_frame.video_frame.pack_forget()
+            self.config_frame.rtk_check.pack_forget()
+            self.config_frame.rtk_fields_frame.pack_forget()
+            
+            # Zmiana etykiet statusu w monitorze usług
+            self.advanced_actions_frame.industrial_status_label.config(
+                text=f"{self.config_manager.translate('Core Service')}: ○"
+            )
+            self.advanced_actions_frame.video_status_label.config(
+                text=f"{self.config_manager.translate('Web Service')}: ○"
+            )
+            
+            # Wyłączenie akcji developerskich specyficznych dla Dockera
+            self.advanced_actions_frame.backup_button.config(state="disabled")
+            self.advanced_actions_frame.update_docker_button.config(state="disabled")
+            self.advanced_actions_frame.hot_deploy_button.config(state="disabled")
+            self.advanced_actions_frame.fast_update_button.config(state="disabled")
+        else:
+            # Przywrócenie widoczności sekcji dla standardowego RCSIM (Docker)
+            self.config_frame.video_frame.pack(fill=tk.X, pady=(10, 5))
+            self.config_frame.rtk_check.pack(anchor="w", pady=(5, 5))
+            self._toggle_rtk_fields()
+            
+            # Przywrócenie etykiet statusu
+            self.advanced_actions_frame.industrial_status_label.config(
+                text=f"{self.config_manager.translate('Industrial')}: ○"
+            )
+            self.advanced_actions_frame.video_status_label.config(
+                text=f"{self.config_manager.translate('Video')}: ○"
+            )
+            
+            # Włączenie akcji developerskich dla Dockera
+            self.advanced_actions_frame.backup_button.config(state="normal")
+            self.advanced_actions_frame.update_docker_button.config(state="normal")
+            self.advanced_actions_frame.hot_deploy_button.config(state="normal")
+            self.advanced_actions_frame.fast_update_button.config(state="normal")
 
     def _toggle_ssh_key_mode(self) -> None:
         use_key = self.config_manager.rpi_use_key_var.get()
@@ -741,7 +786,8 @@ class DeploymentApp:
                     self._log, self.config_manager.translate, **self._get_creds()
                 )
                 if ssh:
-                    logs = deployment_logic.fetch_logs(ssh)
+                    app_type = self.config_manager.app_type_var.get()
+                    logs = deployment_logic.fetch_logs(ssh, app_type=app_type)
                     if logs:
                         for line in logs.splitlines():
                             self._log(line, "verbose")
@@ -763,7 +809,8 @@ class DeploymentApp:
                     self._log, self.config_manager.translate, **self._get_creds()
                 )
                 if ssh:
-                    if deployment_logic.restart_service(ssh):
+                    app_type = self.config_manager.app_type_var.get()
+                    if deployment_logic.restart_service(ssh, app_type=app_type):
                         self._log("Service restarted.", "success")
                     else:
                         self._log("Failed to restart service.", "error")
@@ -783,7 +830,8 @@ class DeploymentApp:
                     self._log, self.config_manager.translate, **self._get_creds()
                 )
                 if ssh:
-                    logs = deployment_logic.fetch_logs(ssh)
+                    app_type = self.config_manager.app_type_var.get()
+                    logs = deployment_logic.fetch_logs(ssh, app_type=app_type)
                     if logs:
                         # Show in separate window
                         self.root.after(0, lambda: self._open_log_window(logs))
@@ -805,19 +853,20 @@ class DeploymentApp:
                     self._log, self.config_manager.translate, **self._get_creds()
                 )
                 if ssh:
-                    logs = deployment_logic.fetch_build_logs(ssh)
+                    app_type = self.config_manager.app_type_var.get()
+                    logs = deployment_logic.fetch_build_logs(ssh, app_type=app_type)
                     if logs:
                         # Show in separate window
                         self.root.after(
                             0,
                             lambda: self._open_log_window(
-                                logs, title="Docker Build Logs"
+                                logs, title="Build/Installation Logs"
                             ),
                         )
                     else:
-                        self._log("Failed to fetch build logs.", "error")
+                        self._log("Failed to fetch logs.", "error")
             except Exception as e:
-                self._log(f"Build logs error: {e}", "error")
+                self._log(f"Build/Installation logs error: {e}", "error")
             finally:
                 if ssh:
                     ssh.close()

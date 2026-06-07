@@ -96,25 +96,43 @@ class ServiceMonitor:
                 timeout=2,
             )
             if ssh:
-                # Check rcsim_industrial
-                ind_status = deployment_logic.check_remote_service_status(
-                    ssh, "rcsim_industrial"
-                )
-                vid_status = deployment_logic.check_remote_service_status(
-                    ssh, "mediamtx.service"
-                )
+                app_type = self.config.app_type_var.get()
+                if app_type == "RCSIM_MCS":
+                    ind_status = deployment_logic.check_remote_service_status(
+                        ssh, "usb_rc.service"
+                    )
+                    vid_status = ind_status
 
-                def update_labels() -> None:
-                    if self.industrial_label.winfo_exists():
-                        self.industrial_label.config(
-                            foreground="green" if ind_status else "red",
-                            text=f"{self.config.translate('Industrial')}: {'●' if ind_status else '○'}",
-                        )
-                    if self.video_label.winfo_exists():
-                        self.video_label.config(
-                            foreground="green" if vid_status else "red",
-                            text=f"{self.config.translate('Video')}: {'●' if vid_status else '○'}",
-                        )
+                    def update_labels() -> None:
+                        if self.industrial_label.winfo_exists():
+                            self.industrial_label.config(
+                                foreground="green" if ind_status else "red",
+                                text=f"{self.config.translate('Core Service')}: {'●' if ind_status else '○'}",
+                            )
+                        if self.video_label.winfo_exists():
+                            self.video_label.config(
+                                foreground="green" if vid_status else "red",
+                                text=f"{self.config.translate('Web Service')}: {'●' if vid_status else '○'}",
+                            )
+                else:
+                    ind_status = deployment_logic.check_remote_service_status(
+                        ssh, "rcsim_industrial"
+                    )
+                    vid_status = deployment_logic.check_remote_service_status(
+                        ssh, "mediamtx.service"
+                    )
+
+                    def update_labels() -> None:
+                        if self.industrial_label.winfo_exists():
+                            self.industrial_label.config(
+                                foreground="green" if ind_status else "red",
+                                text=f"{self.config.translate('Industrial')}: {'●' if ind_status else '○'}",
+                            )
+                        if self.video_label.winfo_exists():
+                            self.video_label.config(
+                                foreground="green" if vid_status else "red",
+                                text=f"{self.config.translate('Video')}: {'●' if vid_status else '○'}",
+                            )
 
                 self.root.after(0, update_labels)
         except Exception as e:

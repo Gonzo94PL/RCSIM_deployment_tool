@@ -556,7 +556,7 @@ if [ "$FAST_MODE" != "1" ]; then
         manage_overlay "$CAMERA_TYPE,$CAMERA_PORT"
     fi
 
-    # MAVLink / Nomad UART (GPIO8=TX, GPIO9=RX)
+    # MAVLink / Nomad UART (GPIO12=TX, GPIO13=RX)
     manage_overlay "uart3"
 
     # Optimization: PCIe Gen 3 (optional but good for Hailo)
@@ -729,6 +729,109 @@ exit 0
     return script_template.format(**script_params)
 
 
+def get_setup_script_mcs(
+    user: str,
+    home: str,
+    new_pass: str,
+) -> str:
+    script_params = {
+        "user": user,
+        "home": f"/home/{user}",
+        "new_pass": new_pass if new_pass is not None else "",
+    }
+    script_template = r"""#!/bin/bash
+set -e
+USER_NAME="{user}"
+HOME_DIR="{home}"
+LOG_FILE="$HOME_DIR/rpi_setup_mcs.log"
+RCSIM_PROJECT_DIR="/opt/usb_rc_converter"
+NEW_SSH_PASS="{new_pass}"
+
+log() {{
+    echo "[$(date '+%H:%M:%S')] $1" | sudo tee -a "$LOG_FILE"
+}}
+
+check_exit_code() {{
+    if [ $? -ne 0 ]; then
+        log "CRITICAL ERROR: Last operation failed. Aborting."
+        exit 1
+    fi
+}}
+
+sudo rm -f "$LOG_FILE" && sudo touch "$LOG_FILE"
+sudo chown $USER_NAME:$USER_NAME "$LOG_FILE"
+
+log "--- STARTING RCSIM MCS CONFIGURATION ---"
+
+log "[Step 1/5] Installing System Packages..."
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update -y
+sudo apt-get install -y -qq python3-venv python3-pip i2c-tools unzip
+
+log "[Step 2/5] Deploying project files..."
+sudo mkdir -p "$RCSIM_PROJECT_DIR"
+sudo unzip -o -q "{home}/rcsim_project.zip" -d "$RCSIM_PROJECT_DIR"
+sudo chown -R $USER_NAME:$USER_NAME "$RCSIM_PROJECT_DIR"
+find "$RCSIM_PROJECT_DIR" -name "*.sh" -exec sed -i 's/\r$//' {{}} + || true
+
+log "[Step 3/5] Setting up Virtual Environment & Dependencies..."
+cd "$RCSIM_PROJECT_DIR"
+python3 -m venv venv
+./venv/bin/pip install --upgrade pip
+./venv/bin/pip install -r requirements.txt
+
+log "[Step 4/5] Configuring system groups..."
+sudo usermod -aG input $USER_NAME
+sudo usermod -aG i2c $USER_NAME
+
+log "[Step 5/5] Releasing Systemd Services..."
+sudo systemctl disable --now usb_rc_core.service usb_rc_web.service 2>/dev/null || true
+sudo rm -f /etc/systemd/system/usb_rc_core.service /etc/systemd/system/usb_rc_web.service
+sudo cp systemd/usb_rc.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable usb_rc.service
+sudo systemctl restart usb_rc.service
+
+log "[Extra] Configuring UART/Serial hardware parameters in config.txt..."
+# Wyłączenie konsoli szeregowej jądra Linux, która przejmuje /dev/ttyAMA0
+sudo systemctl stop serial-getty@ttyAMA0.service 2>/dev/null || true
+sudo systemctl disable serial-getty@ttyAMA0.service 2>/dev/null || true
+
+# Zmiana w cmdline.txt w celu usunięcia konsoli szeregowej
+if [ -f /boot/firmware/cmdline.txt ]; then
+    sudo sed -i 's/console=serial0,[0-9]* //g' /boot/firmware/cmdline.txt || true
+    sudo sed -i 's/console=ttyAMA0,[0-9]* //g' /boot/firmware/cmdline.txt || true
+elif [ -f /boot/cmdline.txt ]; then
+    sudo sed -i 's/console=serial0,[0-9]* //g' /boot/cmdline.txt || true
+    sudo sed -i 's/console=ttyAMA0,[0-9]* //g' /boot/cmdline.txt || true
+fi
+
+# Włączenie UART w config.txt
+CONFIG_TXT="/boot/firmware/config.txt"
+[ ! -f "$CONFIG_TXT" ] && CONFIG_TXT="/boot/config.txt"
+
+if [ -f "$CONFIG_TXT" ]; then
+    # Usunięcie starych wpisów i dodanie poprawnych
+    sudo sed -i '/^enable_uart=/d' "$CONFIG_TXT" || true
+    sudo sed -i '/^dtoverlay=uart0/d' "$CONFIG_TXT" || true
+    
+    echo "enable_uart=1" | sudo tee -a "$CONFIG_TXT" > /dev/null
+    echo "dtoverlay=uart0" | sudo tee -a "$CONFIG_TXT" > /dev/null
+    log "Konfiguracja UART wgrana do $CONFIG_TXT. Wymagany restart RPi!"
+fi
+
+if [ ! -z "$NEW_SSH_PASS" ]; then
+    echo "$USER_NAME:$NEW_SSH_PASS" | sudo chpasswd
+    log "SSH password changed."
+fi
+sudo rm -f "{home}/rcsim_project.zip"
+
+log "--- MCS DEPLOYMENT COMPLETED SUCCESSFULLY ---"
+exit 0
+"""
+    return script_template.format(**script_params)
+
+
 def create_project_archive(
     log_func: Callable[[str, str], None],
     gettext_func: Callable[[str], str],
@@ -741,6 +844,7 @@ def create_project_archive(
     ntrip_port: str,
     ntrip_mount: str,
     full_config_payload: Dict[str, Any],
+    app_type: str = "RCSIM_DOCKER",
 ) -> Optional[str]:
     """
     Tworzy archiwum ZIP projektu z wygenerowanym plikiem konfiguracyjnym.
@@ -765,12 +869,40 @@ def create_project_archive(
     """
     _ = gettext_func
     if not os.path.isdir(project_source_dir):
-        # Using print or log_func since messagebox is UI specific.
-        # Following existing pattern assuming caller handles UI.
-        # Actually this function is logic only, so log_func is correct.
         if log_func:
             log_func(f"Directory not found: {project_source_dir}", "error")
         return None
+
+    if app_type == "RCSIM_MCS":
+        temp_dir = "temp_deploy"
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        os.makedirs(temp_dir, exist_ok=True)
+        try:
+            temp_project_path = os.path.join(temp_dir, "project_content")
+            ignore = shutil.ignore_patterns(
+                ".idea",
+                "__pycache__",
+                "*.pyc",
+                "*.tmp",
+                ".git",
+                ".venv",
+                "venv",
+                ".pytest_cache",
+                ".vscode",
+                "logs",
+                "temp_deploy",
+                "node_modules",
+                ".next",
+                "*.zip",
+                "*.tar.gz",
+            )
+            shutil.copytree(project_source_dir, temp_project_path, ignore=ignore)
+            archive_base_path = os.path.join(temp_dir, "rcsim_project")
+            return shutil.make_archive(archive_base_path, "zip", temp_project_path)
+        except Exception as e:
+            if log_func:
+                log_func(f"Archive error for MCS: {e}", "error")
+            return None
 
     # Base config merged with payload from GUI
     config_data: Dict[str, Any] = {
@@ -1001,7 +1133,11 @@ def run_full_deployment(
         on_complete: Callback wywoływany po zakończeniu.
     """
     _ = gettext_func
-    log_func(_("\n--- Starting Docker-based deployment ---"), "header")
+    app_type = config_data.get("app_type", "RCSIM_DOCKER")
+    if app_type == "RCSIM_MCS":
+        log_func(_("\n--- Starting MCS-based deployment ---"), "header")
+    else:
+        log_func(_("\n--- Starting Docker-based deployment ---"), "header")
     progress_callback(5)
 
     ssh = None
@@ -1010,44 +1146,62 @@ def run_full_deployment(
         # 1. Archive
         full_config = config_data.get("full_config_payload", {})
 
-        # Camera Port
-        camera_port = full_config.get("camera", {}).get("port", "cam0")
-        camera_resolution = full_config.get("camera", {}).get("resolution", [1280, 720])
-        camera_fps = full_config.get("camera", {}).get("fps", 30)
+        if app_type == "RCSIM_MCS":
+            archive_path = create_project_archive(
+                log_func,
+                _,
+                config_data.get("project_source_dir"),
+                config_data.get("pc_tailscale_ip"),
+                config_data.get("use_rtk"),
+                config_data.get("ntrip_user"),
+                config_data.get("ntrip_pass"),
+                config_data.get("ntrip_host"),
+                config_data.get("ntrip_port"),
+                config_data.get("ntrip_mount"),
+                full_config,
+                app_type="RCSIM_MCS",
+            )
+        else:
+            # Camera Port
+            camera_port = full_config.get("camera", {}).get("port", "cam0")
+            camera_resolution = full_config.get("camera", {}).get("resolution", [1280, 720])
+            camera_fps = full_config.get("camera", {}).get("fps", 30)
 
-        # DEBUG VERSION CHECK
-        log_func("!!! DEBUG: USING NEW CAMERA_AI URL (Date: 2026-01-29) !!!", "header")
+            # DEBUG VERSION CHECK
+            log_func("!!! DEBUG: USING NEW CAMERA_AI URL (Date: 2026-01-29) !!!", "header")
 
-        full_config.setdefault("video", {}).update(
-            {
-                "engine": "native",
-                "resolution": camera_resolution,
-                "fps": camera_fps,
-            }
-        )
-        full_config.setdefault("camera", {}).update(
-            {
-                "mode": "rtsp",
-                "rtsp_url": "rtsp://127.0.0.1:8554/camera_ai",
-                "resolution": camera_resolution,
-                "fps": camera_fps,
-                "port": camera_port,
-            }
-        )
+            full_config.setdefault("video", {}).update(
+                {
+                    "engine": "native",
+                    "resolution": camera_resolution,
+                    "fps": camera_fps,
+                }
+            )
+            full_config.setdefault("camera", {}).update(
+                {
+                    "mode": "rtsp",
+                    "rtsp_url": "rtsp://127.0.0.1:8554/camera_ai",
+                    "resolution": camera_resolution,
+                    "fps": camera_fps,
+                    "port": camera_port,
+                }
+            )
 
-        archive_path = create_project_archive(
-            log_func,
-            _,
-            config_data.get("project_source_dir"),
-            config_data.get("pc_tailscale_ip"),
-            config_data.get("use_rtk"),
-            config_data.get("ntrip_user"),
-            config_data.get("ntrip_pass"),
-            config_data.get("ntrip_host"),
-            config_data.get("ntrip_port"),
-            config_data.get("ntrip_mount"),
-            full_config,
-        )
+            archive_path = create_project_archive(
+                log_func,
+                _,
+                config_data.get("project_source_dir"),
+                config_data.get("pc_tailscale_ip"),
+                config_data.get("use_rtk"),
+                config_data.get("ntrip_user"),
+                config_data.get("ntrip_pass"),
+                config_data.get("ntrip_host"),
+                config_data.get("ntrip_port"),
+                config_data.get("ntrip_mount"),
+                full_config,
+                app_type="RCSIM_DOCKER",
+            )
+
         if not archive_path:
             error_msg = (
                 "Failed to create archive from: "
@@ -1081,14 +1235,21 @@ def run_full_deployment(
         sftp.put(archive_path, remote_archive_path)
         log_func(_("Archive upload complete."), "success")
 
-        setup_script_content = get_setup_script(
-            config_data.get("rpi_user"),
-            f"/home/{config_data.get('rpi_user')}",
-            config_data.get("new_ssh_pass"),
-            camera_port,
-            camera_type=full_config.get("camera", {}).get("type", "AUTO"),
-            fast_mode=fast_mode,
-        )
+        if app_type == "RCSIM_MCS":
+            setup_script_content = get_setup_script_mcs(
+                config_data.get("rpi_user"),
+                f"/home/{config_data.get('rpi_user')}",
+                config_data.get("new_ssh_pass"),
+            )
+        else:
+            setup_script_content = get_setup_script(
+                config_data.get("rpi_user"),
+                f"/home/{config_data.get('rpi_user')}",
+                config_data.get("new_ssh_pass"),
+                camera_port,
+                camera_type=full_config.get("camera", {}).get("type", "AUTO"),
+                fast_mode=fast_mode,
+            )
         remote_script_path = f"/home/{config_data.get('rpi_user')}/auto_setup.sh"
         with sftp.file(remote_script_path, "w") as f:
             f.write(setup_script_content)
@@ -1149,6 +1310,27 @@ def run_full_deployment(
             if on_complete:
                 on_complete(True, "Deployment successful!")
         else:
+            try:
+                log_func(_("\n--- Fetching error logs from RPi ---"), "header")
+                # Read setup log
+                setup_log_filename = "rpi_setup_mcs.log" if app_type == "RCSIM_MCS" else "rpi_setup_docker.log"
+                stdin, stdout, stderr = ssh.exec_command(f"tail -n 35 /home/{config_data.get('rpi_user')}/{setup_log_filename}")
+                setup_log = stdout.read().decode("utf-8", "ignore")
+                log_func(_("Last 35 lines of {0}:").format(setup_log_filename), "warning")
+                for line in setup_log.splitlines():
+                    log_func(line, "normal")
+
+                if app_type != "RCSIM_MCS":
+                    # Read docker build log if it exists and failed
+                    stdin, stdout, stderr = ssh.exec_command(f"tail -n 35 /home/{config_data.get('rpi_user')}/docker_build.log")
+                    build_log = stdout.read().decode("utf-8", "ignore")
+                    if build_log.strip():
+                        log_func(_("\nLast 35 lines of docker_build.log:"), "error")
+                        for line in build_log.splitlines():
+                            log_func(line, "normal")
+            except Exception as log_err:
+                log_func(f"Failed to fetch remote error logs: {log_err}", "error")
+
             if on_complete:
                 on_complete(False, f"Script failed with exit code {exit_status}")
 
@@ -1766,42 +1948,51 @@ def check_remote_service_status(ssh: paramiko.SSHClient, service_name: str) -> b
         return False
 
 
-def restart_service(ssh: paramiko.SSHClient) -> bool:
+def restart_service(ssh: paramiko.SSHClient, app_type: str = "RCSIM_DOCKER") -> bool:
     """
-    Restartuje główny kontener aplikacji.
-    Restarts the main application container.
+    Restartuje główny kontener aplikacji lub usługi systemd.
+    Restarts the main application container or systemd services.
     """
     try:
-        ssh.exec_command("sudo docker restart rcsim_industrial")
+        if app_type == "RCSIM_MCS":
+            ssh.exec_command("sudo systemctl restart usb_rc.service")
+        else:
+            ssh.exec_command("sudo docker restart rcsim_industrial")
         return True
     except Exception:
         return False
 
 
-def fetch_logs(ssh: paramiko.SSHClient) -> Optional[str]:
+def fetch_logs(ssh: paramiko.SSHClient, app_type: str = "RCSIM_DOCKER") -> Optional[str]:
     """
-    Pobiera ostatnie 100 linii logów kontenera.
-    Fetches the last 100 lines of container logs.
+    Pobiera ostatnie 100 linii logów kontenera lub usług systemd.
+    Fetches the last 100 lines of container or systemd service logs.
     """
     try:
-        stdin, stdout, stderr = ssh.exec_command(
-            "sudo docker logs --tail 100 rcsim_industrial"
-        )
+        if app_type == "RCSIM_MCS":
+            stdin, stdout, stderr = ssh.exec_command(
+                "sudo journalctl -u usb_rc.service -n 100 --no-pager"
+            )
+        else:
+            stdin, stdout, stderr = ssh.exec_command(
+                "sudo docker logs --tail 100 rcsim_industrial"
+            )
         return stdout.read().decode()
     except Exception:
         return None
 
 
-def fetch_build_logs(ssh: paramiko.SSHClient) -> Optional[str]:
+def fetch_build_logs(ssh: paramiko.SSHClient, app_type: str = "RCSIM_DOCKER") -> Optional[str]:
     """
-    Pobiera log z budowania środowiska Docker.
-    Fetches the docker build log.
+    Pobiera log z instalacji/budowania środowiska.
+    Fetches the installation or build log.
     """
     try:
-        stdin, stdout, stderr = ssh.exec_command("cat ~/docker_build.log")
+        log_file = "~/rpi_setup_mcs.log" if app_type == "RCSIM_MCS" else "~/docker_build.log"
+        stdin, stdout, stderr = ssh.exec_command(f"cat {log_file}")
         content = stdout.read().decode()
         if not content:
-            return "No build logs found (docker_build.log is empty or missing)."
+            return f"No logs found ({log_file} is empty or missing)."
         return content
     except Exception:
         return None

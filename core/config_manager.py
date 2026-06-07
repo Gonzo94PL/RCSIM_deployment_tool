@@ -33,6 +33,7 @@ class ConfigManager:
 
         # UI Variables
         self.language_var = tk.StringVar(value="English")
+        self.app_type_var = tk.StringVar(value="RCSIM_DOCKER")
         self.project_source_dir_var = tk.StringVar(
             value=os.environ.get(
                 "RCSIM_DEPLOY_PATH",
@@ -152,6 +153,7 @@ class ConfigManager:
             "mavlink_system_id": self.mavlink_system_id_var.get(),
             "mavlink_throttle_hz": self.mavlink_throttle_hz_var.get(),
             "fast_mode": self.fast_mode_var.get(),
+            "app_type": self.app_type_var.get(),
         }
         try:
             with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
@@ -208,6 +210,7 @@ class ConfigManager:
             safe_set(self.mavlink_system_id_var, "mavlink_system_id")
             safe_set(self.mavlink_throttle_hz_var, "mavlink_throttle_hz")
             safe_set(self.fast_mode_var, "fast_mode")
+            safe_set(self.app_type_var, "app_type")
 
             if self.language_var.get() in SUPPORTED_LANGUAGES:
                 l_code = SUPPORTED_LANGUAGES[self.language_var.get()]
@@ -317,5 +320,6 @@ class ConfigManager:
                 if self.rpi_use_key_var.get()
                 else None
             ),
+            "app_type": self.app_type_var.get(),
             "full_config_payload": self.get_full_config_payload(),
         }
