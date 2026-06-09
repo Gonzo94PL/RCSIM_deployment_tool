@@ -3,8 +3,8 @@
 Aplikacja Wdrożeniowa RCSIM RPi5 (Deployment Tool).
 RCSIM RPi5 Deployment Application.
 
-Wersja v7.1.0 (2025-02-14)
-Author: [User/Developer Name]
+Wersja v2.0.0 (2026-06-09)
+Author: RCSIM / Mateusz 
 """
 
 import logging
