@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RCSIM RPi5 Deployment Tool v8.0.0 Web</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="logo-area">
+            <span class="logo-icon">🚀</span>
+            <div class="logo-text">
+                <h1 data-translate="app-title">RCSIM Deployment Tool</h1>
+                <span class="logo-version" data-translate="app-subtitle">v8.0.0 Web UI • Premium Edition</span>
+            </div>
+        </div>
+        <div class="status-badge-container">
+            <div id="ping-status" class="status-pill status-offline">
+                <span class="status-dot"></span>
+                <span class="status-label" id="lbl-status-ping">RPi: Offline</span>
+            </div>
+            <div id="ind-status" class="status-pill status-offline">
+                <span class="status-dot"></span>
+                <span class="status-label" id="lbl-status-ind">Industrial: Off</span>
+            </div>
+            <div id="vid-status" class="status-pill status-offline">
+                <span class="status-dot"></span>
+                <span class="status-label" id="lbl-status-vid">Video: Off</span>
+            </div>
+        </div>
+        <div class="header-controls">
+            <button id="btn-shutdown-server" class="btn btn-mini btn-danger" data-translate="btn-shutdown">Shutdown Server</button>
+            <select id="lang-selector" class="select-input select-lang">
+                <option value="English">English</option>
+                <option value="Polski">Polski</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <!-- LEFT SIDEBAR: Connection Settings -->
+        <aside class="sidebar card">
+            <div class="card-header">
+                <h2 data-translate="header-connection">🔑 Connection Settings</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label id="lbl-rpi-host">RPi Host/IP</label>
+                    <input type="text" id="rpi_host" placeholder="e.g. 10.0.0.5 or tailscale-ip">
+                </div>
+                <div class="form-group">
+                    <label id="lbl-rpi-user">SSH Username</label>
+                    <input type="text" id="rpi_user" placeholder="e.g. pi">
+                </div>
+                
+                <div class="form-group row-checkbox">
+                    <input type="checkbox" id="rpi_use_key">
+                    <label for="rpi_use_key" id="lbl-rpi-use-key">Use SSH Private Key</label>
+                </div>
+
+                <div id="password-mode-fields">
+                    <div class="form-group">
+                        <label id="lbl-rpi-pass">SSH Password</label>
+                        <input type="password" id="rpi_pass" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div id="key-mode-fields" class="hidden">
+                    <div class="form-group">
+                        <label id="lbl-rpi-key-path">Key Path</label>
+                        <div class="input-with-action">
+                            <input type="text" id="rpi_key_path" placeholder="C:/Users/.../.ssh/id_rsa">
+                            <button id="btn-browse-key" class="btn btn-mini" data-translate="btn-browse">Browse</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-rpi-key-passphrase">Key Passphrase</label>
+                        <input type="password" id="rpi_key_passphrase" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-new-ssh-pass">New SSH Password (Optional)</label>
+                    <input type="password" id="new_ssh_pass" placeholder="Leave empty to keep current">
+                </div>
+
+                <div class="button-group-stacked">
+                    <button id="btn-test-connection" class="btn btn-secondary" data-translate="btn-test-connection">Test Connection</button>
+                    <button id="btn-scan-hardware" class="btn btn-secondary" data-translate="btn-scan-hardware">Scan Hardware (I2C/UART)</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MIDDLE AREA: Configurations -->
+        <main class="content">
+            <!-- Source & Target Card -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 data-translate="header-source">📂 Source & Platform Configuration</h2>
+                </div>
+                <div class="card-body grid-2">
+                    <div class="form-group">
+                        <label id="lbl-project-source">Project Source Path</label>
+                        <div class="input-with-action">
+                            <input type="text" id="project_source" placeholder="C:/path/to/project_source">
+                            <button id="btn-browse-project" class="btn btn-mini" data-translate="btn-browse">Browse</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-app-type">Application Platform Type</label>
+                        <select id="app_type" class="select-input">
+                            <option value="RCSIM_DOCKER" data-translate="opt-docker">Standard RCSIM (Docker & MediaMTX)</option>
+                            <option value="RCSIM_MCS" data-translate="opt-mcs">RCSIM MCS (Direct Services)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Network & Comm Card -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 data-translate="header-network">🌐 Network & Communication</h2>
+                </div>
+                <div class="card-body grid-3">
+                    <div class="form-group">
+                        <label id="lbl-pc-tailscale-ip">PC IP (Tailscale)</label>
+                        <div class="input-with-action">
+                            <input type="text" id="pc_tailscale_ip" placeholder="100.x.y.z">
+                            <button id="btn-fetch-pc-ip" class="btn btn-mini" data-translate="btn-fetch">Fetch</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-pc-udp-port">PC UDP Telemetry Port</label>
+                        <input type="text" id="pc_udp_port" placeholder="12347">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-rpi-udp-port">RPi UDP Telemetry Port</label>
+                        <input type="text" id="rpi_udp_port" placeholder="12346">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-comm-mode">Comm Mode</label>
+                        <select id="comm_mode" class="select-input">
+                            <option value="AUTO">AUTO (Failsafe fallback)</option>
+                            <option value="WEBRTC">WEBRTC</option>
+                            <option value="UDP">UDP</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-comm-protocol">Comm Protocol</label>
+                        <select id="comm_protocol" class="select-input">
+                            <option value="NATIVE">NATIVE</option>
+                            <option value="MAVLINK">MAVLINK</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hardware Card -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 data-translate="header-hardware">⚙️ Hardware & Sensors</h2>
+                </div>
+                <div class="card-body grid-3">
+                    <div class="form-group">
+                        <label id="lbl-imu-driver">IMU Driver</label>
+                        <select id="imu_driver" class="select-input">
+                            <option value="native_mpu9250">MPU9250 (Native)</option>
+                            <option value="native_mpu6050">MPU6050 (Native)</option>
+                            <option value="native_gy91">GY-91</option>
+                            <option value="native_bmx160_bmp388">BMX160 + BMP388</option>
+                            <option value="native_bmx160">BMX160</option>
+                            <option value="native_bno08x">BNO08x</option>
+                            <option value="dummy">Simulation (Dummy IMU)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group border-left">
+                        <div class="row-checkbox margin-bottom-sm">
+                            <input type="checkbox" id="gps_enabled">
+                            <label for="gps_enabled" id="lbl-gps-enabled">Enable GPS</label>
+                        </div>
+                        <input type="text" id="gps_port" placeholder="GPS Serial Port">
+                        <input type="text" id="gps_baudrate" placeholder="Baudrate">
+                    </div>
+
+                    <div class="form-group border-left">
+                        <div class="row-checkbox margin-bottom-sm">
+                            <input type="checkbox" id="lidar_enabled">
+                            <label for="lidar_enabled" id="lbl-lidar-enabled">Enable LiDAR</label>
+                        </div>
+                        <input type="text" id="lidar_port" placeholder="LiDAR Port">
+                        <input type="text" id="lidar_baudrate" placeholder="Baudrate">
+                    </div>
+                    
+                    <div class="form-group border-left">
+                        <div class="row-checkbox margin-bottom-sm">
+                            <input type="checkbox" id="elrs_enabled">
+                            <label for="elrs_enabled" id="lbl-elrs-enabled">Enable ELRS / MAVLink Serial</label>
+                        </div>
+                        <input type="text" id="elrs_port" placeholder="ELRS Serial Port">
+                        <input type="text" id="elrs_baudrate" placeholder="Baudrate">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Video & RTK Section (Conditional Grid) -->
+            <div class="grid-2-col">
+                <!-- Video Settings Card -->
+                <section class="card" id="card-video">
+                    <div class="card-header">
+                        <h2 data-translate="header-video">📹 Video & Streaming</h2>
+                    </div>
+                    <div class="card-body grid-2">
+                        <div class="form-group">
+                            <label id="lbl-camera-port">Camera CSI Port</label>
+                            <select id="camera_port" class="select-input">
+                                <option value="cam0">CSI Cam 0</option>
+                                <option value="cam1">CSI Cam 1</option>
+                                <option value="/dev/video0">/dev/video0</option>
+                                <option value="/dev/video1">/dev/video1</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="lbl-camera-type">Camera Sensor Type</label>
+                            <select id="camera_type" class="select-input">
+                                <option value="AUTO">AUTO (Detect)</option>
+                                <option value="imx219">Raspberry Pi Cam v2 (imx219)</option>
+                                <option value="imx708">Raspberry Pi Cam v3 (imx708)</option>
+                                <option value="ov5647">Raspberry Pi Cam v1 (ov5647)</option>
+                                <option value="imx477">High Quality Cam (imx477)</option>
+                                <option value="imx519">imx519</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="lbl-camera-resolution">Resolution</label>
+                            <input type="text" id="camera_resolution" placeholder="1920x1080">
+                        </div>
+                        <div class="form-group">
+                            <label id="lbl-camera-fps">FPS</label>
+                            <input type="text" id="camera_fps" placeholder="30">
+                        </div>
+                        <div class="form-group">
+                            <label id="lbl-camera-bitrate">Video Bitrate</label>
+                            <input type="text" id="camera_bitrate" placeholder="5 Mbps">
+                        </div>
+                        <div class="form-group form-align-end flex-row gap-sm">
+                            <button id="btn-detect-cameras" class="btn btn-secondary" data-translate="btn-detect">Detect CSI Cameras</button>
+                            <button id="btn-low-latency" class="btn btn-small btn-full" data-translate="btn-low-latency">Low Latency Profile</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- RTK Settings Card -->
+                <section class="card" id="card-rtk">
+                    <div class="card-header">
+                        <h2 data-translate="header-rtk">🛰️ RTK Differential GNSS</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row-checkbox margin-bottom-sm">
+                            <input type="checkbox" id="use_rtk">
+                            <label for="use_rtk" id="lbl-use-rtk">Enable NTRIP RTK Client</label>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label id="lbl-ntrip-host">NTRIP Host</label>
+                                <input type="text" id="ntrip_host" placeholder="rtk2go.com">
+                            </div>
+                            <div class="form-group">
+                                <label id="lbl-ntrip-port">NTRIP Port</label>
+                                <input type="text" id="ntrip_port" placeholder="2101">
+                            </div>
+                            <div class="form-group">
+                                <label id="lbl-ntrip-mount">Mount Point</label>
+                                <input type="text" id="ntrip_mount" placeholder="MOUNT">
+                            </div>
+                            <div class="form-group">
+                                <label id="lbl-ntrip-user">NTRIP Username</label>
+                                <input type="text" id="ntrip_user" placeholder="username">
+                            </div>
+                            <div class="form-group">
+                                <label id="lbl-ntrip-pass">NTRIP Password</label>
+                                <input type="password" id="ntrip_pass" placeholder="••••••••">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: Deployment Actions -->
+        <aside class="right-panel card">
+            <div class="card-header">
+                <h2 data-translate="header-control">⚡ Deployment Control</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group row-checkbox">
+                    <input type="checkbox" id="fast_mode">
+                    <label for="fast_mode" id="lbl-fast-mode">Fast Deploy (Skip OS Config)</label>
+                </div>
+
+                <div class="button-group-stacked action-buttons">
+                    <button id="btn-deploy-full" class="btn btn-primary btn-large" data-translate="btn-deploy-full">🚀 FULL DEPLOYMENT</button>
+                    <button id="btn-deploy-docker-update" class="btn btn-primary" data-translate="btn-deploy-docker-update">🐳 Docker Rebuild & Update</button>
+                    <button id="btn-deploy-hot" class="btn btn-accent" data-translate="btn-deploy-hot">🔥 Hot Deploy Code (~30s)</button>
+                </div>
+
+                <hr class="separator">
+
+                <div class="card-header-sub">
+                    <h3 data-translate="header-utility">🛠️ Utility Actions</h3>
+                </div>
+                <div class="button-grid">
+                    <button id="btn-fast-camera-update" class="btn btn-small" data-translate="btn-cam-update">Cam Config Only</button>
+                    <button id="btn-backup-docker" class="btn btn-small" data-translate="btn-backup">Backup Docker Vol</button>
+                    <button id="btn-restart-service" class="btn btn-small" data-translate="btn-restart">Restart Service</button>
+                    <button id="btn-reboot-pi" class="btn btn-small btn-danger" data-translate="btn-reboot">Reboot Pi</button>
+                    <button id="btn-run-diagnostics" class="btn btn-small" data-translate="btn-diagnostics">Diagnostics</button>
+                    <button id="btn-show-logs" class="btn btn-small" data-translate="btn-logs">App Logs</button>
+                    <button id="btn-show-build-logs" class="btn btn-small" data-translate="btn-build-logs">Build Logs</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- BOTTOM SECTION: Console & Progress -->
+    <footer class="console-footer card">
+        <div class="console-header">
+            <div class="title-area">
+                <span class="console-icon">🐚</span>
+                <h2 data-translate="header-console">Deployment Live Console</h2>
+            </div>
+            <button id="btn-clear-console" class="btn btn-mini btn-secondary" data-translate="btn-clear">Clear Console</button>
+        </div>
+        <div class="console-terminal" id="terminal-output">
+            <div class="line verbose">[00:00:00] Web console initialized. Select options and launch deployment.</div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="deploy-progress" style="width: 0%;"></div>
+        </div>
+    </footer>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

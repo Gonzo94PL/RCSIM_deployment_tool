@@ -766,7 +766,7 @@ log "--- STARTING RCSIM MCS CONFIGURATION ---"
 log "[Step 1/5] Installing System Packages..."
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y
-sudo apt-get install -y -qq python3-venv python3-pip i2c-tools unzip
+sudo apt-get install -y -qq python3-venv python3-pip i2c-tools unzip git picotool
 
 log "[Step 2/5] Deploying project files..."
 sudo mkdir -p "$RCSIM_PROJECT_DIR"

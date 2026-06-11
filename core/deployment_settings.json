@@ -1,5 +1,5 @@
 {
-    "rpi_host": "192.168.31.223",
+    "rpi_host": "192.168.31.224",
     "rpi_user": "pi",
     "rpi_pass": "1",
     "project_source": "C:/Users/Mateusz/Desktop/RCSIM27.04monacoSLAM/RCSIM_MCS",
