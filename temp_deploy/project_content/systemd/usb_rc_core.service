@@ -1,0 +1,20 @@
+[Unit]
+Description=USB to RC Converter Core (Input/Mixing/Output Controller)
+After=network.target
+Before=usb_rc_web.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/usb_rc_converter
+ExecStart=/opt/usb_rc_converter/venv/bin/python3 src/main.py --no-web
+Restart=always
+RestartSec=3
+
+# Dopasowanie procesora czasu rzeczywistego dla optymalnego jittera sygnału
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=50
+CPUAffinity=3
+
+[Install]
+WantedBy=multi-user.target

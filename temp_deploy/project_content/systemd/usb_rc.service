@@ -1,0 +1,20 @@
+[Unit]
+Description=USB to RC Converter Controller & API Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/usb_rc_converter
+Environment=PYTHONPATH=/opt/usb_rc_converter
+ExecStart=/opt/usb_rc_converter/venv/bin/python3 src/main.py
+Restart=always
+RestartSec=3
+
+# Optymalizacje czasu rzeczywistego (RT) pod kątem stabilności sygnału RC:
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=50
+CPUAffinity=3
+
+[Install]
+WantedBy=multi-user.target

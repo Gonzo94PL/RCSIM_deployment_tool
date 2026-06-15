@@ -3,10 +3,10 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from deployment_tool.deployment_logic import (create_project_archive,
-                                              generate_mediamtx_config,
-                                              get_setup_script,
-                                              strip_ansi_codes)
+from core.deployment_logic import (create_project_archive,
+                                      generate_mediamtx_config,
+                                      get_setup_script,
+                                      strip_ansi_codes)
 
 
 class TestDeploymentLogic(unittest.TestCase):

@@ -290,6 +290,7 @@ def get_setup_script(
     camera_port: str = "cam0",
     camera_type: str = "AUTO",
     fast_mode: bool = False,
+    system_time: str = "",
 ) -> str:
     """
     Generuje skrypt Bash do pełnej konfiguracji RPi.
@@ -311,6 +312,7 @@ def get_setup_script(
         "camera_port": camera_port,
         "camera_type": camera_type,
         "fast_mode": "1" if fast_mode else "0",
+        "system_time": system_time,
     }
     script_template = r"""
 #!/bin/bash
@@ -325,6 +327,7 @@ FAST_MODE="{fast_mode}"
 NEW_SSH_PASS="{new_pass}"
 CAMERA_PORT="{camera_port}"
 CAMERA_TYPE="{camera_type}"
+SYSTEM_TIME="{system_time}"
 
 # Funkcja logowania / Logging function
 log() {{
@@ -342,6 +345,11 @@ sudo rm -f "$LOG_FILE" && sudo touch "$LOG_FILE"
 sudo chown $USER_NAME:$USER_NAME "$LOG_FILE"
 
 log "--- STARTING RCSIM INDUSTRIAL CONFIGURATION (v7.1 OPTIMIZED) ---"
+
+if [ ! -z "$SYSTEM_TIME" ]; then
+    log "Setting RPi system clock to local time: $SYSTEM_TIME..."
+    sudo date -s "$SYSTEM_TIME" || true
+fi
 
 if [ "$FAST_MODE" == "1" ]; then
     log ">>> FAST MODE ACTIVE: Skipping system configuration steps <<<"
@@ -733,11 +741,13 @@ def get_setup_script_mcs(
     user: str,
     home: str,
     new_pass: str,
+    system_time: str = "",
 ) -> str:
     script_params = {
         "user": user,
         "home": f"/home/{user}",
         "new_pass": new_pass if new_pass is not None else "",
+        "system_time": system_time,
     }
     script_template = r"""#!/bin/bash
 set -e
@@ -746,6 +756,7 @@ HOME_DIR="{home}"
 LOG_FILE="$HOME_DIR/rpi_setup_mcs.log"
 RCSIM_PROJECT_DIR="/opt/usb_rc_converter"
 NEW_SSH_PASS="{new_pass}"
+SYSTEM_TIME="{system_time}"
 
 log() {{
     echo "[$(date '+%H:%M:%S')] $1" | sudo tee -a "$LOG_FILE"
@@ -762,6 +773,11 @@ sudo rm -f "$LOG_FILE" && sudo touch "$LOG_FILE"
 sudo chown $USER_NAME:$USER_NAME "$LOG_FILE"
 
 log "--- STARTING RCSIM MCS CONFIGURATION ---"
+
+if [ ! -z "$SYSTEM_TIME" ]; then
+    log "Setting RPi system clock to local time: $SYSTEM_TIME..."
+    sudo date -s "$SYSTEM_TIME" || true
+fi
 
 log "[Step 1/5] Installing System Packages..."
 export DEBIAN_FRONTEND=noninteractive
@@ -792,7 +808,14 @@ sudo systemctl daemon-reload
 sudo systemctl enable usb_rc.service
 sudo systemctl restart usb_rc.service
 
-log "[Extra] Configuring UART/Serial hardware parameters in config.txt..."
+log "[Extra] Configuring I2C and UART/Serial hardware parameters in config.txt..."
+# Włączenie modułu jądra i2c-dev
+if [ -f /etc/modules ]; then
+    if ! grep -q "^i2c-dev" /etc/modules; then
+        echo "i2c-dev" | sudo tee -a /etc/modules > /dev/null
+    fi
+fi
+
 # Wyłączenie konsoli szeregowej jądra Linux, która przejmuje /dev/ttyAMA0
 sudo systemctl stop serial-getty@ttyAMA0.service 2>/dev/null || true
 sudo systemctl disable serial-getty@ttyAMA0.service 2>/dev/null || true
@@ -806,7 +829,7 @@ elif [ -f /boot/cmdline.txt ]; then
     sudo sed -i 's/console=ttyAMA0,[0-9]* //g' /boot/cmdline.txt || true
 fi
 
-# Włączenie UART w config.txt
+# Włączenie UART i I2C w config.txt
 CONFIG_TXT="/boot/firmware/config.txt"
 [ ! -f "$CONFIG_TXT" ] && CONFIG_TXT="/boot/config.txt"
 
@@ -814,10 +837,13 @@ if [ -f "$CONFIG_TXT" ]; then
     # Usunięcie starych wpisów i dodanie poprawnych
     sudo sed -i '/^enable_uart=/d' "$CONFIG_TXT" || true
     sudo sed -i '/^dtoverlay=uart0/d' "$CONFIG_TXT" || true
+    sudo sed -i '/^dtparam=i2c_arm=/d' "$CONFIG_TXT" || true
+    sudo sed -i '/^dtparam=i2c=/d' "$CONFIG_TXT" || true
     
     echo "enable_uart=1" | sudo tee -a "$CONFIG_TXT" > /dev/null
     echo "dtoverlay=uart0" | sudo tee -a "$CONFIG_TXT" > /dev/null
-    log "Konfiguracja UART wgrana do $CONFIG_TXT. Wymagany restart RPi!"
+    echo "dtparam=i2c_arm=on" | sudo tee -a "$CONFIG_TXT" > /dev/null
+    log "Konfiguracja UART i I2C wgrana do $CONFIG_TXT. Wymagany restart RPi!"
 fi
 
 if [ ! -z "$NEW_SSH_PASS" ]; then
@@ -1240,6 +1266,7 @@ def run_full_deployment(
                 config_data.get("rpi_user"),
                 f"/home/{config_data.get('rpi_user')}",
                 config_data.get("new_ssh_pass"),
+                system_time=time.strftime("%Y-%m-%d %H:%M:%S"),
             )
         else:
             setup_script_content = get_setup_script(
@@ -1249,6 +1276,7 @@ def run_full_deployment(
                 camera_port,
                 camera_type=full_config.get("camera", {}).get("type", "AUTO"),
                 fast_mode=fast_mode,
+                system_time=time.strftime("%Y-%m-%d %H:%M:%S"),
             )
         remote_script_path = f"/home/{config_data.get('rpi_user')}/auto_setup.sh"
         with sftp.file(remote_script_path, "w") as f:
