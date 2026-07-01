@@ -1,8 +1,8 @@
 {
-    "rpi_host": "",
-    "rpi_user": "",
-    "rpi_pass": "",
-    "project_source": "",
+    "rpi_host": "192.168.31.223",
+    "rpi_user": "pi",
+    "rpi_pass": "1",
+    "project_source": "RCSIM_MCS",
     "pc_tailscale_ip": "",
     "use_rtk": true,
     "ntrip_user": "",
@@ -36,5 +36,5 @@
     "mavlink_system_id": "1",
     "mavlink_throttle_hz": "50",
     "fast_mode": false,
-    "app_type": ""
+    "app_type": "RCSIM_MCS"
 }

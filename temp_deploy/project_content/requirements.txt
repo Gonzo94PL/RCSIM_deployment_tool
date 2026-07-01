@@ -1,0 +1,9 @@
+# Wymagania systemowe (USB-to-RC RPi 5 Controller Board)
+fastapi>=0.110.0
+uvicorn>=0.28.0
+evdev>=1.7.0
+pyserial>=3.5
+smbus2>=0.4.3
+esptool>=4.7.0
+luma.oled>=3.13.0
+python-multipart>=0.0.9

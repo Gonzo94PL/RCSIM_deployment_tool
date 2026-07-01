@@ -1,0 +1,16 @@
+[Unit]
+Description=USB to RC Converter Web Panel and Control Room (FastAPI)
+After=network.target usb_rc_core.service
+
+[Service]
+Type=notify
+NotifyAccess=all
+WatchdogSec=5
+User=root
+WorkingDirectory=/opt/usb_rc_converter
+ExecStart=/opt/usb_rc_converter/venv/bin/python3 -m uvicorn src.api.server:app --host 0.0.0.0 --port 8080 --log-level warning
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

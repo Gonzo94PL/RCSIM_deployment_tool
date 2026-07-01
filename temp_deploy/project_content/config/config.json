@@ -1,0 +1,74 @@
+{
+  "language": "pl",
+  "api": {
+    "host": "0.0.0.0",
+    "port": 8080
+  },
+  "output_protocol": "sbus",
+  "output_port": "/dev/ttyACM0",
+  "selected_profile": "quad_5_cal",
+  "profiles": {
+    "quad_5_cal": {
+      "name": "Quad_5_Cal",
+      "battery_type": "2S",
+      "inputs": [
+        {
+          "device_name": "RadioMaster TX16S (USB HID)",
+          "ffb_autocenter": 0,
+          "steering_range": 900,
+          "hardware_range": 900,
+          "mappings": [
+            {"name": "Throttle", "axis": "ABS_Z", "channel": 3, "reverse": false, "sub_trim": 0, "min_limit": 1000, "max_limit": 2000, "expo": 10, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Aileron", "axis": "ABS_X", "channel": 1, "reverse": false, "sub_trim": 5, "min_limit": 1100, "max_limit": 1900, "expo": 35, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Elevator", "axis": "ABS_Y", "channel": 2, "reverse": true, "sub_trim": -2, "min_limit": 1100, "max_limit": 1900, "expo": 35, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Rudder", "axis": "ABS_RZ", "channel": 4, "reverse": false, "sub_trim": 0, "min_limit": 1050, "max_limit": 1950, "expo": 20, "failsafe_mode": "center", "failsafe_value": 1500}
+          ]
+        }
+      ]
+    },
+    "plane_zagi_fpv": {
+      "name": "Plane_Zagi_FPV",
+      "battery_type": "2S",
+      "inputs": [
+        {
+          "device_name": "RadioMaster TX16S (USB HID)",
+          "ffb_autocenter": 0,
+          "steering_range": 900,
+          "hardware_range": 900,
+          "mappings": [
+            {"name": "Throttle", "axis": "ABS_Z", "channel": 3, "reverse": false, "sub_trim": 0, "min_limit": 1000, "max_limit": 2000, "expo": 5, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Aileron", "axis": "ABS_X", "channel": 1, "reverse": false, "sub_trim": 12, "min_limit": 1150, "max_limit": 1850, "expo": 45, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Elevator", "axis": "ABS_Y", "channel": 2, "reverse": false, "sub_trim": -8, "min_limit": 1150, "max_limit": 1850, "expo": 45, "failsafe_mode": "center", "failsafe_value": 1500}
+          ]
+        }
+      ]
+    },
+    "car_crawler_trx4": {
+      "name": "Car_Crawler_TRX4",
+      "battery_type": "2S",
+      "gearbox_config": {
+        "mode": "sequential",
+        "num_forward_gears": 2,
+        "reverse_throttle_limit": 0.4,
+        "btn_up": "BTN_TR",
+        "btn_down": "BTN_TL"
+      },
+      "drive_mode_btn": "BTN_WEST",
+      "cruise_btn": "BTN_NORTH",
+      "inputs": [
+        {
+          "device_name": "Xbox Wireless Controller",
+          "ffb_autocenter": 0,
+          "steering_range": 900,
+          "hardware_range": 900,
+          "mappings": [
+            {"name": "Throttle", "axis": "ABS_Y", "channel": 2, "reverse": false, "sub_trim": 0, "min_limit": 1000, "max_limit": 2000, "expo": 15, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Aileron", "axis": "ABS_X", "channel": 1, "reverse": false, "sub_trim": 0, "min_limit": 1000, "max_limit": 2000, "expo": 25, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Aux1", "axis": "BTN_A", "channel": 5, "reverse": false, "sub_trim": 0, "min_limit": 1000, "max_limit": 2000, "expo": 0, "failsafe_mode": "center", "failsafe_value": 1500},
+            {"name": "Aux2", "axis": "BTN_B", "channel": 6, "reverse": false, "sub_trim": 0, "min_limit": 1000, "max_limit": 2000, "expo": 0, "failsafe_mode": "center", "failsafe_value": 1500}
+          ]
+        }
+      ]
+    }
+  }
+}

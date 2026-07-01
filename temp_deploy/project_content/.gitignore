@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Additional ignores
+RCSIM_mcs.zip
+*.zip
+*.7z
+*.rar
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+ENV/
+env/
